@@ -1,54 +1,469 @@
-<div class="seal-wrapper" id="waxSeal">
-  <svg class="wax-svg" viewBox="0 0 240 240" width="160" height="160">
-    <defs>
-      <!-- Organic melted edge -->
-      <filter id="wax-edge" x="-15%" y="-15%" width="130%" height="130%">
-        <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="3" seed="12" result="noise"/>
-        <feDisplacementMap in="SourceGraphic" in2="noise" scale="11" xChannelSelector="R" yChannelSelector="G"/>
-      </filter>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Awaiz &amp; Rifah — Wedding Invitation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Great+Vibes&family=Montserrat:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper-bg: #F3EAD8;
+      --paper-dark: #E6D8BE;
+      --gold-primary: #8C6A2E;
+      --gold-muted: #B69554;
+      --text-dark: #3B2F1E;
+      --text-soft: #6B5B45;
+      --sage: #5F6F52;
+      --rose-muted: #B57B74;
+    }
 
-      <!-- Subtle matte grain -->
-      <filter id="wax-grain">
-        <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" stitchTiles="stitch"/>
-        <feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.06 0"/>
-      </filter>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-      <!-- Deep antique gold gradient -->
-      <radialGradient id="antiqueGold" cx="38%" cy="32%" r="68%">
-        <stop offset="0%" stop-color="#C8A96A"/>
-        <stop offset="55%" stop-color="#9E7B3E"/>
-        <stop offset="100%" stop-color="#6E5222"/>
-      </radialGradient>
-    </defs>
+    body {
+      background-color: var(--paper-bg);
+      color: var(--text-dark);
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      min-height: 100dvh;
+      overflow-x: hidden;
+      position: relative;
+    }
 
-    <!-- Outer irregular wax blob -->
-    <circle cx="120" cy="120" r="96" fill="url(#antiqueGold)" filter="url(#wax-edge)" />
-    <circle cx="120" cy="120" r="96" filter="url(#wax-grain)" opacity="0.6" />
+    /* Subtle cardstock grain overlay */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.35;
+      z-index: 50;
+      background-image: radial-gradient(rgba(91, 66, 25, 0.14) 0.75px, transparent 0.75px);
+      background-size: 14px 14px;
+    }
 
-    <!-- Debossed inner stamp rim -->
-    <circle cx="120" cy="120" r="72" fill="none" stroke="#5B4219" stroke-width="3" opacity="0.75"/>
-    <circle cx="120" cy="120" r="69" fill="none" stroke="#DFC387" stroke-width="1" opacity="0.55"/>
+    /* ================= ENVELOPE COVER ================= */
+    .envelope-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at 50% 42%, #F8F2E6 0%, var(--paper-bg) 62%, var(--paper-dark) 100%);
+      transition: opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1), transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+      overflow: hidden;
+    }
 
-    <!-- Stamped Monogram -->
-    <text x="120" y="128" text-anchor="middle"
-          font-family="'Cormorant Garamond', Georgia, serif"
-          font-size="38" font-weight="600" letter-spacing="2"
-          fill="#5B4219" style="text-shadow: 0px 1px 0px rgba(255,235,190,0.45);">
-      A &amp; R
-    </text>
-  </svg>
-</div>
+    .envelope-screen.opened {
+      opacity: 0;
+      transform: scale(1.06);
+      pointer-events: none;
+    }
 
-<style>
-  .seal-wrapper {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    filter: drop-shadow(0 12px 20px rgba(62, 45, 18, 0.28));
-    transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-  .seal-wrapper:active {
-    transform: scale(0.95);
-  }
-</style>
+    /* Envelope diagonal fold lines */
+    .envelope-folds {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .seal-stage {
+      position: relative;
+      z-index: 5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-top: -24px;
+    }
+
+    /* Delicate botanical sprig behind seal */
+    .botanical-cluster {
+      position: relative;
+      width: 280px;
+      height: 220px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .botanical-svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      filter: drop-shadow(0 4px 8px rgba(59, 47, 30, 0.08));
+    }
+
+    /* Wax Seal Button */
+    .seal-btn {
+      position: relative;
+      z-index: 3;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      filter: drop-shadow(0 14px 22px rgba(62, 45, 18, 0.32));
+      transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+      animation: gentlePulse 3.2s ease-in-out infinite;
+    }
+
+    .seal-btn:active {
+      transform: scale(0.93);
+    }
+
+    @keyframes gentlePulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.03); }
+    }
+
+    .envelope-caption {
+      margin-top: 22px;
+      text-align: center;
+      z-index: 5;
+    }
+
+    .tap-label {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.26em;
+      text-transform: uppercase;
+      color: var(--gold-primary);
+      margin-bottom: 8px;
+    }
+
+    .couple-names {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 1.65rem;
+      font-weight: 500;
+      color: var(--text-dark);
+      letter-spacing: 0.03em;
+    }
+
+    /* ================= INVITATION CARD ================= */
+    .invite-container {
+      min-height: 100dvh;
+      padding: 20px 16px 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.9s ease 0.25s, transform 0.9s ease 0.25s;
+    }
+
+    .invite-container.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .card-frame {
+      width: 100%;
+      max-width: 420px;
+      background: #FAF6EE;
+      border: 1px solid rgba(182, 149, 84, 0.45);
+      border-radius: 16px;
+      padding: 10px;
+      box-shadow: 0 18px 40px rgba(59, 47, 30, 0.09);
+      position: relative;
+    }
+
+    .card-inner {
+      border: 1.5px solid rgba(182, 149, 84, 0.55);
+      border-radius: 11px;
+      padding: 44px 24px 36px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .corner-floral {
+      position: absolute;
+      width: 115px;
+      height: 115px;
+      pointer-events: none;
+      opacity: 0.88;
+    }
+
+    .corner-tl { top: -6px; left: -6px; }
+    .corner-tr { top: -6px; right: -6px; transform: scaleX(-1); }
+    .corner-bl { bottom: -6px; left: -6px; transform: scaleY(-1); }
+    .corner-br { bottom: -6px; right: -6px; transform: scale(-1, -1); }
+
+    .bismillah-sub {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.24em;
+      color: var(--gold-primary);
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .event-title {
+      font-family: 'Great Vibes', cursive;
+      font-size: 3.6rem;
+      font-weight: 400;
+      color: #4A3819;
+      line-height: 1.1;
+      margin-bottom: 14px;
+    }
+
+    .divider-ornament {
+      width: 90px;
+      height: 16px;
+      margin: 0 auto 22px;
+      display: block;
+    }
+
+    .detail-block {
+      margin-bottom: 22px;
+    }
+
+    .detail-label {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.68rem;
+      letter-spacing: 0.22em;
+      color: var(--gold-muted);
+      text-transform: uppercase;
+      margin-bottom: 5px;
+    }
+
+    .detail-main {
+      font-size: 1.32rem;
+      font-weight: 600;
+      color: var(--text-dark);
+      line-height: 1.3;
+    }
+
+    .detail-sub {
+      font-style: italic;
+      font-size: 1.05rem;
+      color: var(--text-soft);
+      margin-top: 2px;
+    }
+
+    .location-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 8px;
+      padding: 13px 26px;
+      background: linear-gradient(135deg, #8C6A2E 0%, #6F511E 100%);
+      color: #FAF6EE;
+      text-decoration: none;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.74rem;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      border-radius: 6px;
+      box-shadow: 0 8px 18px rgba(111, 81, 30, 0.25);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .location-btn:active {
+      transform: translateY(1px);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ================= SCREEN 1: ENVELOPE & WAX SEAL ================= -->
+  <section class="envelope-screen" id="envelopeScreen">
+    <svg class="envelope-folds" viewBox="0 0 400 800" preserveAspectRatio="none">
+      <!-- Top flap shadow & crease -->
+      <polygon points="0,0 400,0 200,385" fill="rgba(222, 206, 176, 0.32)" />
+      <polyline points="0,0 200,385 400,0" fill="none" stroke="rgba(166, 134, 78, 0.35)" stroke-width="1.2" />
+      <!-- Bottom flap crease -->
+      <polyline points="0,800 200,385 400,800" fill="none" stroke="rgba(166, 134, 78, 0.25)" stroke-width="1" />
+    </svg>
+
+    <div class="seal-stage">
+      <div class="botanical-cluster">
+        <!-- Organic botanical stems & foliage behind the seal -->
+        <svg class="botanical-svg" viewBox="0 0 280 220">
+          <!-- Left Eucalyptus Branch -->
+          <path d="M135,115 Q85,105 32,122" fill="none" stroke="#6B7A5E" stroke-width="1.5" stroke-linecap="round"/>
+          <ellipse cx="95" cy="102" rx="13" ry="7" transform="rotate(-25 95 102)" fill="#7A8B6C" opacity="0.88"/>
+          <ellipse cx="68" cy="107" rx="14" ry="7.5" transform="rotate(-18 68 107)" fill="#68785B" opacity="0.92"/>
+          <ellipse cx="42" cy="118" rx="12" ry="6.5" transform="rotate(-10 42 118)" fill="#849675" opacity="0.85"/>
+          <ellipse cx="82" cy="122" rx="12" ry="6.5" transform="rotate(24 82 122)" fill="#627255" opacity="0.85"/>
+          <ellipse cx="55" cy="127" rx="11" ry="6" transform="rotate(20 55 127)" fill="#7A8B6C" opacity="0.82"/>
+
+          <!-- Right Eucalyptus Branch -->
+          <path d="M145,115 Q195,105 248,122" fill="none" stroke="#6B7A5E" stroke-width="1.5" stroke-linecap="round"/>
+          <ellipse cx="185" cy="102" rx="13" ry="7" transform="rotate(25 185 102)" fill="#7A8B6C" opacity="0.88"/>
+          <ellipse cx="212" cy="107" rx="14" ry="7.5" transform="rotate(18 212 107)" fill="#68785B" opacity="0.92"/>
+          <ellipse cx="238" cy="118" rx="12" ry="6.5" transform="rotate(10 238 118)" fill="#849675" opacity="0.85"/>
+          <ellipse cx="198" cy="122" rx="12" ry="6.5" transform="rotate(-24 198 122)" fill="#627255" opacity="0.85"/>
+          <ellipse cx="225" cy="127" rx="11" ry="6" transform="rotate(-20 225 127)" fill="#7A8B6C" opacity="0.82"/>
+
+          <!-- Delicate Gold & Rose Buds -->
+          <path d="M105,92 Q82,66 64,58" fill="none" stroke="#B69554" stroke-width="1.1"/>
+          <circle cx="64" cy="58" r="4" fill="#C8A96A"/>
+          <path d="M175,92 Q198,66 216,58" fill="none" stroke="#B69554" stroke-width="1.1"/>
+          <circle cx="216" cy="58" r="4" fill="#C8A96A"/>
+
+          <!-- Soft layered rose petals (top-left & bottom-right) -->
+          <g transform="translate(88, 76)">
+            <path d="M0,-14 C10,-14 15,-4 10,6 C4,14 -8,12 -12,4 C-15,-4 -8,-14 0,-14 Z" fill="#C98D86" opacity="0.85"/>
+            <path d="M-2,-9 C5,-9 9,-2 5,4 C1,9 -6,8 -8,2 C-10,-3 -6,-9 -2,-9 Z" fill="#DFABA4" opacity="0.9"/>
+            <path d="M0,-4 C3,-4 5,-1 3,2 C1,5 -3,4 -4,1 C-5,-1 -2,-4 0,-4 Z" fill="#A86962" opacity="0.75"/>
+          </g>
+
+          <g transform="translate(192, 142)">
+            <path d="M0,-14 C10,-14 15,-4 10,6 C4,14 -8,12 -12,4 C-15,-4 -8,-14 0,-14 Z" fill="#C98D86" opacity="0.85"/>
+            <path d="M-2,-9 C5,-9 9,-2 5,4 C1,9 -6,8 -8,2 C-10,-3 -6,-9 -2,-9 Z" fill="#DFABA4" opacity="0.9"/>
+            <path d="M0,-4 C3,-4 5,-1 3,2 C1,5 -3,4 -4,1 C-5,-1 -2,-4 0,-4 Z" fill="#A86962" opacity="0.75"/>
+          </g>
+        </svg>
+
+        <!-- Antique Gold Wax Seal -->
+        <button class="seal-btn" id="openSealBtn" aria-label="Tap seal to open invitation">
+          <svg viewBox="0 0 240 240" width="148" height="148">
+            <defs>
+              <filter id="wax-edge" x="-15%" y="-15%" width="130%" height="130%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.036" numOctaves="3" seed="14" result="noise"/>
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="11" xChannelSelector="R" yChannelSelector="G"/>
+              </filter>
+              <radialGradient id="antiqueGold" cx="38%" cy="32%" r="68%">
+                <stop offset="0%" stop-color="#D1B274"/>
+                <stop offset="55%" stop-color="#9E7B3E"/>
+                <stop offset="100%" stop-color="#6B4F20"/>
+              </radialGradient>
+            </defs>
+
+            <!-- Irregular melted wax base -->
+            <circle cx="120" cy="120" r="96" fill="url(#antiqueGold)" filter="url(#wax-edge)" />
+            <!-- Subtle inner rim depression -->
+            <circle cx="120" cy="120" r="73" fill="none" stroke="#583F16" stroke-width="3.2" opacity="0.78"/>
+            <circle cx="120" cy="120" r="69.5" fill="none" stroke="#E5CA90" stroke-width="1.1" opacity="0.6"/>
+
+            <!-- Stamped Monogram -->
+            <text x="120" y="129" text-anchor="middle"
+                  font-family="'Cormorant Garamond', Georgia, serif"
+                  font-size="38" font-weight="600" letter-spacing="2"
+                  fill="#523A13" style="text-shadow: 0px 1px 0px rgba(255,238,196,0.48);">
+              A &amp; R
+            </text>
+          </svg>
+        </button>
+      </div>
+
+      <div class="envelope-caption">
+        <p class="tap-label">Tap Seal to Open</p>
+        <p class="couple-names">Awaiz &amp; Rifah</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= SCREEN 2: NIKAH DETAILS CARD ================= -->
+  <main class="invite-container" id="inviteCard">
+    <div class="card-frame">
+      <div class="card-inner">
+        <!-- Corner botanical accents -->
+        <svg class="corner-floral corner-tl" viewBox="0 0 120 120">
+          <path d="M12,92 Q22,42 86,14" fill="none" stroke="#6B7A5E" stroke-width="1.4" stroke-linecap="round"/>
+          <ellipse cx="34" cy="64" rx="11" ry="5.5" transform="rotate(-52 34 64)" fill="#7A8B6C" opacity="0.85"/>
+          <ellipse cx="54" cy="42" rx="11" ry="5.5" transform="rotate(-38 54 42)" fill="#68785B" opacity="0.88"/>
+          <ellipse cx="22" cy="48" rx="10" ry="5" transform="rotate(-12 22 48)" fill="#849675" opacity="0.8"/>
+          <g transform="translate(32, 32)">
+            <path d="M0,-13 C9,-13 14,-4 9,5 C4,13 -7,11 -11,4 C-14,-4 -7,-13 0,-13 Z" fill="#C98D86" opacity="0.85"/>
+            <path d="M-2,-8 C4,-8 8,-2 4,4 C1,8 -5,7 -7,2 C-9,-3 -5,-8 -2,-8 Z" fill="#DFABA4" opacity="0.92"/>
+          </g>
+          <circle cx="72" cy="24" r="3.5" fill="#C8A96A"/>
+        </svg>
+
+        <svg class="corner-floral corner-tr" viewBox="0 0 120 120">
+          <path d="M12,92 Q22,42 86,14" fill="none" stroke="#6B7A5E" stroke-width="1.4" stroke-linecap="round"/>
+          <ellipse cx="34" cy="64" rx="11" ry="5.5" transform="rotate(-52 34 64)" fill="#7A8B6C" opacity="0.85"/>
+          <ellipse cx="54" cy="42" rx="11" ry="5.5" transform="rotate(-38 54 42)" fill="#68785B" opacity="0.88"/>
+          <ellipse cx="22" cy="48" rx="10" ry="5" transform="rotate(-12 22 48)" fill="#849675" opacity="0.8"/>
+          <g transform="translate(32, 32)">
+            <path d="M0,-13 C9,-13 14,-4 9,5 C4,13 -7,11 -11,4 C-14,-4 -7,-13 0,-13 Z" fill="#C98D86" opacity="0.85"/>
+            <path d="M-2,-8 C4,-8 8,-2 4,4 C1,8 -5,7 -7,2 C-9,-3 -5,-8 -2,-8 Z" fill="#DFABA4" opacity="0.92"/>
+          </g>
+          <circle cx="72" cy="24" r="3.5" fill="#C8A96A"/>
+        </svg>
+
+        <svg class="corner-floral corner-bl" viewBox="0 0 120 120">
+          <path d="M12,92 Q22,42 86,14" fill="none" stroke="#6B7A5E" stroke-width="1.4" stroke-linecap="round"/>
+          <ellipse cx="34" cy="64" rx="11" ry="5.5" transform="rotate(-52 34 64)" fill="#7A8B6C" opacity="0.85"/>
+          <ellipse cx="54" cy="42" rx="11" ry="5.5" transform="rotate(-38 54 42)" fill="#68785B" opacity="0.88"/>
+          <g transform="translate(32, 32)">
+            <path d="M0,-13 C9,-13 14,-4 9,5 C4,13 -7,11 -11,4 C-14,-4 -7,-13 0,-13 Z" fill="#C98D86" opacity="0.85"/>
+            <path d="M-2,-8 C4,-8 8,-2 4,4 C1,8 -5,7 -7,2 C-9,-3 -5,-8 -2,-8 Z" fill="#DFABA4" opacity="0.92"/>
+          </g>
+        </svg>
+
+        <svg class="corner-floral corner-br" viewBox="0 0 120 120">
+          <path d="M12,92 Q22,42 86,14" fill="none" stroke="#6B7A5E" stroke-width="1.4" stroke-linecap="round"/>
+          <ellipse cx="34" cy="64" rx="11" ry="5.5" transform="rotate(-52 34 64)" fill="#7A8B6C" opacity="0.85"/>
+          <ellipse cx="54" cy="42" rx="11" ry="5.5" transform="rotate(-38 54 42)" fill="#68785B" opacity="0.88"/>
+          <g transform="translate(32, 32)">
+            <path d="M0,-13 C9,-13 14,-4 9,5 C4,13 -7,11 -11,4 C-14,-4 -7,-13 0,-13 Z" fill="#C98D86" opacity="0.85"/>
+            <path d="M-2,-8 C4,-8 8,-2 4,4 C1,8 -5,7 -7,2 C-9,-3 -5,-8 -2,-8 Z" fill="#DFABA4" opacity="0.92"/>
+          </g>
+        </svg>
+
+        <p class="bismillah-sub">In Sha Allah</p>
+        <h1 class="event-title">Nikah</h1>
+
+        <svg class="divider-ornament" viewBox="0 0 100 18">
+          <line x1="8" y1="9" x2="40" y2="9" stroke="#B69554" stroke-width="0.9"/>
+          <polygon points="50,4 55,9 50,14 45,9" fill="none" stroke="#8C6A2E" stroke-width="1"/>
+          <line x1="60" y1="9" x2="92" y2="9" stroke="#B69554" stroke-width="0.9"/>
+        </svg>
+
+        <div class="detail-block">
+          <p class="detail-label">Date</p>
+          <p class="detail-main">Thursday, 17th December 2026</p>
+          <p class="detail-sub">(8 Rajab 1448 Hijri)</p>
+        </div>
+
+        <div class="detail-block">
+          <p class="detail-label">Time</p>
+          <p class="detail-main">After Namaz-e-Asr (3:30 PM)</p>
+        </div>
+
+        <div class="detail-block">
+          <p class="detail-label">Venue</p>
+          <p class="detail-main">Choti Charminar Masjid</p>
+          <p class="detail-sub">Shivajinagar, Bangalore – 560001</p>
+        </div>
+
+        <a class="location-btn"
+           href="https://www.google.com/maps/search/?api=1&query=Choti+Charminar+Masjid+Shivajinagar+Bangalore+560001"
+           target="_blank"
+           rel="noopener noreferrer">
+          <span>View Location</span>
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const openSealBtn = document.getElementById('openSealBtn');
+    const envelopeScreen = document.getElementById('envelopeScreen');
+    const inviteCard = document.getElementById('inviteCard');
+
+    openSealBtn.addEventListener('click', () => {
+      envelopeScreen.classList.add('opened');
+      inviteCard.classList.add('visible');
+    });
+  </script>
+</body>
+</html>
